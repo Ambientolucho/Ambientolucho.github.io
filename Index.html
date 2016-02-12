@@ -3,7 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Curriculum de Luis Santamaría López</title>
+    <link href="main.css" rel="stylesheet" type="text/css">
     <meta name="author" content="Luis Santamaria López - @Ambientolucho">
+
+    <link href='https://fonts.googleapis.com/css?family=Dancing+Script' rel='stylesheet' type='text/css'>
+
+    <link href='https://fonts.googleapis.com/css?family=Cabin+Condensed:400,700' rel='stylesheet' type='text/css'>
+    
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    
     <style>
     table, th, td {
         border: 1px solid black;
@@ -15,8 +30,10 @@
     </style>
 </head>
 <body>
+
+<div class="container">
     
-    <p>Mi Curriculum Vitae.</p>
+    <p class="heading">Mi Curriculum Vitae.</p>
     <ul>
         <li><a href="#mark1">Experiencia profesional.</a></li>
         <li><a href="#mark2">Habilidades y conocimientos</a></li>
@@ -25,15 +42,16 @@
         <li><a href="#mark5">Perfiles sociales.</a></li>
     </ul>
     
-    <h1>Luis Santamaría López</h1>
+    <h1 class="heading">Luis Santamaría López</h1>
 
-    <p> Soy un estudiante de máster de ArcGIS y soluciones GIS. </p>
+    <p class="personal"> Soy un estudiante de máster de ArcGIS y soluciones GIS. <br>
+        Me considero una persona responsable y dinámica lo que me permite aprender rápido. </p>
 
-    <img src="resources/images/foto-Luis-Santamaria.jpg"    alt="Luis Santamaria">
+    <img src="resources/images/foto-curriculum.jpg"    alt="Luis Santamaria">
 
     <hr>
 
-    <h2 id="mark1">Experiencia profesional.</h2>
+    <h2 class="heading" id="mark1">Experiencia profesional.</h2>
     
     <table>
         <tr>
@@ -41,26 +59,40 @@
             <th>Cargo</th>		
             <th>Localización</th>
             <th>Inicio y final</th>
+            <th>Descripción</th>
         </tr>
         <tr>
             <td>Juguetrónica</td>
-            <td>Dependiente</td>		
-            <td>Madrid</td>
+            <td class="destacado">Dependiente</td>		
+            <td rowspan="3"><strong>Madrid</strong></td>
             <td>De Marzo a Noviembre de 2015</td>
+            <td>Tuve la ocasión de trabajar de dependiente en la famosa tienda Juguetrónica atendiendo y asesorando a los clientes en materia de robótica infantil educativa y juguetes radio control especialmente <strong>drones de entretenimiento.</strong></td>
+        </tr>
+        <tr>
+            <td>Departamento de TI de la facultad de Medicina en la UAM</td>
+            <td class="destacado">Becario</td>
+            <td>De Febrero de 2013 a Diciembre de 2014</td>
+            <td>Atención a usuarios de la Facultad de Medicina de la Universidad Autónoma de Madrid. Soporte de incidencias de profesores, médicos, administrativos y estudiantes. Instalación de equipos a nivel de <strong>Hardware y Software.</strong></td>
+        </tr>
+        <tr>
+            <td>Librería Deviaje</td>
+            <td class="destacado">Dependiente</td>
+            <td>De Septiembre de 2008 a Agosto de 2013</td>
+            <td><strong>Venta al público</strong> y <strong>asesoramiento</strong> de guías de viaje y literatura.</td>
         </tr>
     </table>
    
     <hr>
 
-    <h2 id="mark2">Habilidades y conocimientos.</h2>
+    <h2 class="heading" id="mark2">Habilidades y conocimientos.</h2>
     <ul>
-        <li>Ofimática</li>
-        <li>Cartografía <strong>ArcGIS Desktop</strong></li>
+        <li><strong>Ofimática:</strong> Microsoft office (Word, Excel, Powerpoint).</li>
+        <li><strong>Cartografía:</strong> ArcGIS (Desktop, AGOL, Arcgis Server)</li>
     </ul>
 
     <hr>
 
-    <h2 id="mark3">Educación.</h2>
+    <h2  class="heading" id="mark3">Educación.</h2>
 
     <table>
         <tr>
@@ -76,31 +108,35 @@
     </table>
     <hr>
 
-    <h2 id="mark4">Idiomas</h2>
+    <h2 class="heading" id="mark4">Idiomas</h2>
     
     <table>
         <tr>
-            <th>Idioma:</th>
-            <th>Título:</th>
+            <th>Idioma</th>
+            <th>Título</th>
+            <th>Fecha de expedición</th>
         </tr>
         <tr>
             <th rowspan="2">Inglés</th>
-                <td style="color: blue">First Certificate Cambridge</td>
+                <td class="destacado">First Certificate Cambridge</td>
+                <td>2015</td>
         </tr>
         <tr>
-                <td style="color: blue">Aptis</td>
+                <td class="destacado">Aptis</td>
+                <td>2015</td>
         </tr>
     </table>
 
     <hr>
 
-    <h2 id="mark5">Perfiles sociales</h2>
+    <h2 class="heading" id="mark5">Perfiles sociales</h2>
     
     <ul>
         <li><a href="https://www.linkedin.com/profile/preview?locale=es_ES&trk=prof-0-sb-preview-primary-button">Linkedin.</a></li>
         <li><a href="https://www.facebook.com/luissantamarialopez">Facebook.</a></li>
     </ul>
-    
+
+</div>    
 </body>        
 
 </html>

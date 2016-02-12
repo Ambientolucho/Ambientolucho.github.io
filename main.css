@@ -1,0 +1,14 @@
+#menu{
+    list 
+}
+.heading{
+    font-family: 'Cabin Condensed', sans-serif;
+    color:maroon;
+}
+.destacado{
+    color:blue;
+}
+.personal{
+    font-family: 'Dancing Script', cursive;
+    font-size: xx-large;
+}
