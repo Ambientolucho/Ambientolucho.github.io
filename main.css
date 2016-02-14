@@ -1,5 +1,11 @@
 body {
   padding-top: 50px;
+  background-image: url('resources/docs/assets/img/BlankMap-World6.png');
+  background-repeat:no-repeat;
+  background-attachment:scroll;
+  background-color:transparent;
+  background-size:contain;
+  background-position:top center;
 }
 .starter-template {
   padding: 40px 15px;
