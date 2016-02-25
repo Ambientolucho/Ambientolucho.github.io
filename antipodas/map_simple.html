@@ -35,9 +35,9 @@
       require([
         "esri/map",
         "esri/geometry/Extent",
-        "dojo/domReady!",
+        "dojo/domReady!"
         ],
-        function(Map, Point) {
+        function(Map, Point) { //,Event Object Property
           var map1;
           map1 = new Map("map1", {
             basemap: "topo",  //For full list of pre-defined basemaps, navigate to http://arcg.is/1JVo6Wd
@@ -58,7 +58,7 @@
             var center = change.extent.getCenter();
             map1.centerAt(center)
           });
-      });
+        });
     </script>
   </head>
 
