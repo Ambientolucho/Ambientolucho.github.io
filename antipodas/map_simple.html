@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    <title>Simple Map</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/3.15/esri/css/esri.css">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    #map1 {
+      width:49.5%;
+      display:block;
+      float:left;
+      border: #663300 1px solid;
+      border-right:none; 
+      margin-bottom:10px;
+    }
+    #map2 {
+      width:49.5%;
+      display:block;
+      float:left;
+      border: #663300 1px solid;
+      border-right:none; 
+      margin-bottom:10px;
+    }
+    </style>
+    <script src="https://js.arcgis.com/3.15/"></script>
+    <script>
+      require([
+        "esri/map",
+        "esri/geometry/Extent",
+        "dojo/domReady!",
+        ],
+        function(Map, Point) {
+          var map1;
+          map1 = new Map("map1", {
+            basemap: "topo",  //For full list of pre-defined basemaps, navigate to http://arcg.is/1JVo6Wd
+            center: [-3.700345, 40.416691], // longitude, latitude
+            zoom: 5
+          });
+          var map2;
+          map2 = new Map("map2", {
+            basemap: "topo",  //For full list of pre-defined basemaps, navigate to http://arcg.is/1JVo6Wd
+            center: [176.299655, -40.416691], // longitude, latitude
+            zoom: 13
+          });
+          map.on("extent-change", function(change){
+            var center = change.extent.getCenter();
+            map2.centerAt(center)
+          });
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="map1" class=map1 ></div>
+    <div id="map2" class=map2 ></div>
+  </body>
+</html>

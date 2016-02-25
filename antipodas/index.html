@@ -1,0 +1,352 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Antipodes Map (AKA Tunnel Map)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="description" content="Antipodes map dynamically shows the opposite point on the earth from that which you select." />
+<meta name="keywords" content="antipode map, tunnel map, latitude, longitude, map, coordinates, geocode, address, lat, lon, lng" />
+<link href="http://www.findlatitudeandlongitude.com/includes/css/antipode-map.css" rel="stylesheet" type="text/css" />
+<link href="http://www.findlatitudeandlongitude.com/includes/css/styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body onload="loader()" onunload="unloader()"><script type="text/javascript" src="http://www.findlatitudeandlongitude.com/includes/javascript/string_funcs.js"></script>
+<script type="text/javascript" src="http://www.findlatitudeandlongitude.com/includes/javascript/coordinate-conversion.js"></script>
+<script type="text/javascript" src="http://www.findlatitudeandlongitude.com/includes/javascript/num_range.js"></script>
+<script type="text/javascript" src="http://www.findlatitudeandlongitude.com/includes/javascript/cookies.js"></script>
+<script type="text/javascript" src="http://www.findlatitudeandlongitude.com/includes/javascript/antipode_map.js"></script>
+<script type="text/javascript" src="http://www.findlatitudeandlongitude.com/includes/javascript/antipode-points.js"></script>
+<script type="text/javascript" src="http://www.findlatitudeandlongitude.com/includes/javascript/debugging.js"></script>
+<script type="text/javascript">
+<!--
+  function loader() {
+    init_maps();
+  }
+
+  function unloader() {
+  }
+
+  function set_focus(el, val){
+    el.hasFocus=val;  
+  }
+  
+  var lat = 38.685509760012;
+  var lon = -96.50390625;
+  var zoom = 4;
+  var zoom2 = 4;
+  var map_type = "roadmap";
+  var map2_type = "roadmap";
+  var host = "www.findlatitudeandlongitude.com";
+  var decouple_zoom = false;
+  var self = "http://www.findlatitudeandlongitude.com/antipode-map/";
+  var geocoder;
+  var address;
+  var debugging = false;
+  var iPhone = false;
+//-->
+</script>
+<style>
+a {
+  cursor:pointer;
+}
+</style>
+<a href="http://www.fsbonm.com/" class="important">Albuquerque Houses for Sale</a>
+<h1 id="h1title">Antipodes Map (AKA Tunnel Map)</h1>
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script type="text/javascript" src="http://www.findlatitudeandlongitude.com/includes/javascript/antipode_map.js"></script>
+<!-- start adsense -->
+<div class="adsense_160x600">
+<script type="text/javascript"><!--
+google_ad_client = "ca-pub-5706779946194051";
+/* Sky Scraper 160x600 */
+google_ad_slot = "4511905051";
+google_ad_width = 160;
+google_ad_height = 600;
+//-->
+</script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></div>
+<!-- stop adsense -->
+<div id="maps_container" style="height:600px;">
+<div id="map_canvas" style="height:600px;"></div>
+<div id="map_canvas_2" style="height:600px;"></div>
+<div id="crosshairs" class="crosshairs_hidden"></div>
+<div id="crosshairs_2" class="crosshairs_hidden"></div>
+<div class="clearboth"></div>
+</div><!--close:id=maps_container-->
+
+<!-- start adsense -->
+<div class="adsense_300x250">
+<script type="text/javascript"><!--
+google_ad_client = "ca-pub-5706779946194051";
+/* Medium Rectangle 300x250 */
+google_ad_slot = "3929173709";
+google_ad_width = 300;
+google_ad_height = 250;
+//-->
+</script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></div>
+<!-- stop adsense -->
+
+<!--<div class="clearboth"></div>-->
+
+
+<div class="info_block" style="overflow-y:auto;">
+<h4>Interesting Antipodal Pairs</h4>
+<div class="row"><span id="pairs" style="cursor:pointer"></span>
+</div>
+</div>
+
+
+<div class="info_block">
+<h4 style="display:inline">Coordinates Input</h4> (left map)<br />
+<div class="row"><span><span class="label">Latitude:</span><span class="value redbrown" id="lat_HMS_in">38&deg;&nbsp;41&#39;&nbsp;7.8351&quot;</span></span></div>
+<div class="row"><span><span class="label">Longitude:</span><span class="value redbrown" id="lon_HMS_in">-96&deg;&nbsp;30&#39;&nbsp;14.0625&quot;</span></span></div>
+<div class="row"><span><span class="label">Latitude:</span><span class="value olive" id="lat_DMD_in">N 38&deg;&nbsp;41.1306&#39;&nbsp;</span></span></div>
+<div class="row"><span><span class="label">Longitude:</span><span class="value olive" id="lon_DMD_in">W 96&deg;&nbsp;30.2344&#39;&nbsp;</span></span></div>
+<div class="row"><span><span class="label">Latitude:</span><span class="value" id="lat_dec_in">38.685509760012&deg;</span></span></div>
+<div class="row"><span><span class="label">Longitude:</span><span class="value" id="lon_dec_in" style="width:100px; float:left;">-96.50390625&deg;</span></span>
+
+<!--<input style="display:inline;" type="image" src="../images/load-button.png" name="geocode" id="geocode_button" onclick="load_LatLng(map.getCenter(), 'p'); load_antipode(map.getCenter()); return false;" alt="geocode latitude and longitude" title="Geocode this latitude and longitude and its antipode." />
+&nbsp;
+<input style="display:inline;" type="image" src="../images/swap-maps.gif" name="swap maps" id="swap_button" onclick="swap_maps(); return false;" alt="swap maps" title="Swap maps." />-->
+
+</div>
+</div>
+<!--
+<input style="display:inline;" type="image" src="../images/load-button.png" name="geocode" id="geocode_button" onclick="do_geocode(); return false;" alt="geocode latitude and longitude" title="geocode latitude and longitude" />
+-->
+<div class="info_block">
+<h4 style="display:inline">Antipodal Coordinates</h4> (right map)<br />
+<div class="row"><span><span class="label">Latitude:</span><span class="value redbrown" id="lat_HMS_ant">-38&deg;&nbsp;41&#39;&nbsp;7.8351&quot;</span></span></div>
+<div class="row"><span><span class="label">Longitude:</span><span class="value redbrown" id="lon_HMS_ant">83&deg;&nbsp;29&#39;&nbsp;45.9375&quot;</span></span></div>
+<div class="row"><span><span class="label">Latitude:</span><span class="value olive" id="lat_DMD_ant">S 38&deg;&nbsp;41.1306&#39;&nbsp;</span></span></div>
+<div class="row"><span><span class="label">Longitude:</span><span class="value olive" id="lon_DMD_ant">E 83&deg;&nbsp;29.7656&#39;&nbsp;</span></span></div>
+<div class="row"><span><span class="label">Latitude:</span><span class="value" id="lat_dec_ant">-38.685509760012&deg;</span></span></div>
+<div class="row"><span><span class="label">Longitude:</span><span class="value" id="lon_dec_ant">83.49609375&deg;</span></span></div>
+</div>
+
+<div class="info_block">
+<div class="row"><h4 style="display:inline;">Locations (Approximate)</h4><input style="display:block; float:right;" type="image" src="../images/load-button.png" name="geocode" id="geocode_button" onclick="load_LatLng(map.getCenter(), 'p'); load_antipode(map.getCenter()); return false;" alt="geocode latitude and longitude" title="Geocode this latitude and longitude and its antipode." /></div>
+<div class="row"><span><span class="label">Primary:</span><span class="value" id="address_p"></span></span></div>
+<div class="row"><span>&nbsp;</span></div>
+<div class="row"><span><span class="label">Antipode:</span><span class="value" id="address_a"></span></span></div>
+<!--<div class="row"><span id="accuracy"><span class="label">Accuracy:</span><span class="value_clip" title=""></span></span></div>
+<div class="row"><span id="accuracy"><span class="label">IP:</span><span class="value"></span></span></div>-->
+</div>
+
+
+<div class="info_block">
+<h4>Antipodes Map Controls</h4>
+<div class="row"><span>&nbsp;</span></div>
+<div class="row"><span id="address"><span class="label">Zoom:</span><span class="value"><label title="Decouple allows the maps to zoom independently of each other."><input type="checkbox" name="decouple_zoom" value="1" onclick="toggle_dz(this)" title="Decouple maps' zooming." /> decouple</label> <span id="zoom_values"></span></span></span></div>
+<div class="row"><span class="label">Geocode</span><span class="value"><input style="display:inline;" type="image" src="../images/load-button.png" name="geocode" id="geocode_button" onclick="load_LatLng(map.getCenter(), 'p'); load_antipode(map.getCenter()); return false;" alt="geocode latitude and longitude" title="Geocode the current coordinates." /> </span></div>
+<div class="row"><span class="label">Swap Maps</span><span class="value"><input type="image" src="../images/swap-maps.gif" name="swap maps" id="swap_button" onclick="swap_maps(); return false;" alt="swap maps" title="Swap maps." /> </span></div>
+</div>
+
+<div class="info_block">
+<form name="load_location" class="forms" onsubmit="dispatch_form(); return false;">
+<h4>Load Location</h4>
+<div class="row"><span id="load_lat_span"><span class="label">Latitude:</span><span class="value"><input class="text" type="text" onfocus="set_focus(this, true)" onblur="set_focus(this, false)" name="lat" maxlength="50" /></span></span></div>
+<div class="row"><span id="load_lon_span"><span class="label">Longitude:</span><span class="value"><input class="text" type="text" onfocus="set_focus(this, true)" onblur="set_focus(this, false)" name="lon" maxlength="50" /> <input type="image" src="../images/load-button.png" name="load_latlon_button" id="load_latlon_button" onclick="dispatch_form(); return false;" alt="load latitude and longitude" title="load latitude and longitude" /></span></span></div>
+<div class="row"><span id="load_address_span"><span class="label">Location:</span><span class="value">
+<input class="text" type="text" onfocus="set_focus(this, true)" onblur="set_focus(this, false)" name="address" maxlength="50" /> <input type="image" src="../images/load-button.png" name="load_address_button" id="load_address_button" onclick="load_address(document.load_location.address.value); return false;" alt="load location" title="load location" /></span></span></div>
+<div class="row"><span id="load_rep"></span></div>
+<input type="hidden" name="sescod" value="" />
+</form>
+</div>
+
+<div class="info_block">
+<h4>Contact Information</h4>
+<div class="row"><span class="label">Developer:</span><span class="value">David B. Zwiefelhofer</span></div>
+<div class="row"><span class="label">Email:</span><span class="value"><a href="&#109;&#x61;&#105;&#108;&#116;&#x6f;&#x3a;&#x77;&#x65;&#98;&#x6d;&#x61;&#115;&#116;&#101;&#x72;&#64;&#102;&#x69;&#110;&#100;&#x6c;&#97;&#x74;&#105;&#116;&#117;&#x64;&#x65;&#97;&#x6e;&#100;&#108;&#111;&#x6e;&#x67;&#x69;&#116;&#117;&#x64;&#x65;&#x2e;&#99;&#x6f;&#109;">&#x77;&#x65;&#98;&#x6d;&#97;&#115;&#x74;&#101;&#114;</a></span></div>
+<div class="row"></div>
+<div class="row"></div>
+<div class="row"><span class="label">Support Us:</span><span class="value"><a href="http://www.findlatitudeandlongitude.com/donate/">Please Donate</a></span></div>
+<div class="row">&nbsp;</div>
+<div style="text-align:center;"><!--<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+<input type="hidden" name="cmd" value="_s-xclick" />
+<input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----
+" />
+<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif" name="submit" alt="PayPal - The safer, easier way to pay online!" />
+<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+</form>
+--></div>
+<!--<div class="row">&nbsp;</div>-->
+<div class="row">
+<!-- Place this tag where you want the +1 button to render. -->
+<div class="g-plusone" data-size="medium" data-annotation="inline" data-width="300"></div>
+<!-- Place this tag in your head or just before your close body tag. -->
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+</div>
+<div class="row"><div id="fb-root"></div>
+<!--<div id="fbsharebutton"></div> -->
+<div id="fblike"></div> 
+<!--<div id="fbcomments"></div>-->
+
+  <script type="text/javascript">
+  // embed Facebook components (avoids xhtml validation issues)
+  
+  var c = document.getElementById('fbrecommendations');
+  
+  if (c != null) {
+  var e = document.createElement('fb:recommendations');
+  e.setAttribute('site', 'http://www.findlatitudeandlongitude.com/antipode-map/');
+  e.setAttribute('width', '246');
+  e.setAttribute('height', '280');
+  e.setAttribute('header', 'true');
+  e.setAttribute('colorscheme', 'light');
+  c.appendChild(e);
+  }
+  
+  c = document.getElementById('fblike');
+  
+  if (c != null) {
+  e = document.createElement('fb:like');
+  e.setAttribute('action', 'like');
+  e.setAttribute('width', '450');
+  c.appendChild(e);
+  }
+  
+  c = document.getElementById('fbsharebutton');
+  
+  if (c != null) {
+  e = document.createElement('fb:share-button');
+  e.setAttribute('action', 'share');
+  e.setAttribute('type', 'button_count');
+  e.setAttribute('width', '473');
+  c.appendChild(e);
+    }
+    
+  c = document.getElementById('fblogin');
+  
+  if (c != null) {
+  e = document.createElement('fb:login-button');
+  e.setAttribute('autologoutlink', 'true');
+  c.appendChild(e);
+  }
+  
+  c = document.getElementById('fbcomments');
+  
+  if (c != null) {
+  e = document.createElement('fb:comments');
+  e.setAttribute('numposts', '100');
+  e.setAttribute('width', '880');
+  c.appendChild(e);
+  }
+  
+// End of additional feautures //
+  
+  // FaceBook initialise
+  window.fbAsyncInit = function () { FB.init({ status: true, cookie: true, xfbml: true }); }; (function () { 
+  var e = document.createElement('script'); 
+  e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js'; e.async = 1; 
+  document.getElementById('fb-root').appendChild(e); 
+  } ());
+  
+  </script>
+</div>
+</div><!--close:class=info_block-->
+<div class="clearboth"></div>
+
+<div class="instruction_block">
+<h4>Instructions</h4>
+<br />
+<div class="row"><strong>Coordinates Input</strong> displays the latitude and longitude coordinates in degrees, minutes, seconds decimal, degrees minutes decimal and degrees decimal of the center point of the left map.</div>
+
+<div class="row"><strong>Antipodal Coordinates</strong> displays the latitude and longitude coordinates of the opposite point of the left map's center. This &quot;opposite&quot; point is displayed on the right map.</div>
+
+<div class="row"><strong>Locations</strong> displays the reverse geocoded location of the current latitude and longitude (approximation only) and its antipodal point on the other side of the earth. Click the <span id="arrow_dsp">&nbsp;&nbsp;&nbsp;&nbsp;</span> arrow to geocode the locations.</div>
+
+<div class="row"><strong>Antipodes Map Controls</strong> Select the &quot;decouple&quot; check box to allow the two maps to zoom independently of each other. Click the &quot;geocode&quot; arrow to geocode the current coordinates. Click the &quot;swap maps&quot; arrows to swap the left and right maps.</div>
+<div class="row"><strong>Load Location</strong>  load a location by coordinates or location name. Enter the desired value and click the load arrow to the right of the appropriate field or hit the enter key. Latitude &amp; longitude  accept degrees decimal, degrees minutes decimal or degrees minutes and seconds decimal.</div>
+</div>
+
+
+
+<div class="instruction_block">
+<h4>Antipodal Points</h4>
+<br />
+<div class="row">The antipode of a point on the surface of a sphere is the point on the other side of the sphere defined by a straight line running from the origin point, through the center of the sphere and intersecting the sphere on the other side. It is the furthest possible point on a sphere from the origin point on the same sphere.<br />
+<br />
+Since most of Earth is covered in water and most of the Earth's land is in the northern hemisphere most points on land have antipodal points in water.<br />
+<br />
+To dig the proverbial hole to <a onclick="load_pair(11)">China</a> you'd have to start in <a onclick="load_pair(8)">South America</a>. Opposite the continental US is the Indian Ocean. In fact, there are only two US states that have antipodal points on land. They are the last two to join the Union, <a onclick="load_pair(18)">Alaska</a> (Antarctica) and <a onclick="load_pair(3)">Hawaii</a> (Botswana, Africa). Well, okay, <a onclick="load_pair(19)">Montana</a> has a tiny little bit, too.<br />
+<br />
+</div>
+</div>
+
+<script type="text/javascript">
+<!--
+  function do_toggle_menu() {
+    var menu_el = document.getElementById("menu");
+    var el = document.getElementById("menu_expander");
+    if (el.className == "menu_opener_closed") {
+      el.className = "menu_opener_opened";
+      menu_el.className = "info_block_open";
+    } else {
+      el.className = "menu_opener_closed";
+      menu_el.className = "info_block";
+    }
+  }
+//-->
+</script>
+<div id="menu" class="info_block">
+  <h4 style="display:block; float:left; margin-bottom:0px; clear:none;">Menu</h4>
+  <span id="menu_expander" class="menu_opener_closed" onclick="do_toggle_menu()"><img src="http://www.findlatitudeandlongitude.com/images/pix.gif" width="13" height="13" alt="expand/contract menu" /></span>
+  <div style="display:block; float:left; margin:0px 0px 0px 30px; clear:none;"><!-- AddThis Button BEGIN -->
+<script type="text/javascript">
+var addthis_disable_flash = true;
+var addthis_config = {
+    data_track_clickback: true,
+  data_track_addressbar: true,
+  ui_click: true
+}
+</script>
+<a class="addthis_button" href="http://www.addthis.com/bookmark.php?v=250&amp;username=zwief"><img src="http://s7.addthis.com/static/btn/v2/lg-share-en.gif" width="125" height="16" alt="Bookmark and Share" style="border:0"/></a><script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#username=zwief"></script>
+<!-- AddThis Button END -->
+</div>
+    <span style="display:inline; float:right; margin:0px;"><a style="display:inline; margin:0px;" href="http://www.findlatitudeandlongitude.com" title="Convert Latitude and Longitude">Home</a></span>
+<br />
+
+<div class="row"><span ><a href="http://www.findlatitudeandlongitude.com/find-address-from-latitude-and-longitude" title="Reverse geocode, get the nearest address of a latitude-longitude coordinate pair.">Lat/Lng to Address</a> &middot; <a href="http://www.findlatitudeandlongitude.com/find-latitude-and-longitude-from-address" title="Address Location Finder: Geocode an address i.e. find the latitude-longitude coordinate pair of an address.">Address to Lat/Lng</a></span></div>
+
+<div class="row"><span ><a href="http://www.findlatitudeandlongitude.com/batch-geocode/" title="Free Batch Geocode: geocode multiple locations in a single batch.">Batch Geocode</a> &middot; <a href="http://www.findlatitudeandlongitude.com/batch-reverse-geocode/" title="Free Reverse Batch Geocode: reverse geocode multiple latitude-longitude coordinate pairs in a single batch.">Batch Reverse Geocode</a></span></div>
+
+<div class="row"><span ><a href="http://www.findlatitudeandlongitude.com/searches/" title="Latest searches on the site.">Location Searches</a> &middot; <a href="http://www.findlatitudeandlongitude.com/reverse-geocodes/" title="Reverse geocodes, latest to oldest.">Reverse Geocodes</a></span></div>
+
+<div class="row"><span style="float:left;"><a href="http://www.findlatitudeandlongitude.com/antipode-map/" title="Tunneling Map AKA Antipodes Map">Antipodes Map</a> (Tunneling Map)</span></div>
+
+<div class="row"><span style="float:left;"><a href="http://www.findlatitudeandlongitude.com/gps-coordinates-converter/" title="Convert latitude-longitude coordinates between degrees decimal and various degrees minutes seconds formats.">GPS Coordinates Converter</a></span></div>
+
+<div class="row"><span title="Give us your constructive input on this site."><a href="&#x6d;&#x61;&#x69;&#x6c;&#116;&#111;&#x3a;&#x77;&#101;&#98;&#x6d;&#x61;&#x73;&#x74;&#101;&#x72;&#x40;&#102;&#x69;&#x6e;&#x64;&#x6c;&#97;&#116;&#x69;&#116;&#x75;&#100;&#101;&#97;&#x6e;&#100;&#x6c;&#111;&#x6e;&#103;&#105;&#x74;&#x75;&#x64;&#x65;&#x2e;&#x63;&#x6f;&#x6d;&#63;&#83;&#117;&#98;&#106;&#101;&#99;&#x74;&#x3d;&#x46;&#x65;&#101;&#x64;&#x62;&#x61;&#99;&#107;&#x2f;&#83;&#x75;&#x67;&#103;&#x65;&#x73;&#116;&#x69;&#x6f;&#110;">&#x46;&#101;&#x65;&#x64;&#98;&#97;&#99;&#x6b;</a> &middot; <a href="http://www.findlatitudeandlongitude.com/click-lat-lng-list/" title="Record multiple latitude-longitude coordinate pairs by clicking in the map.">Record Lat/Longs</a></span></div>
+
+<div class="row"><span style="float:left;"><a href="http://www.findlatitudeandlongitude.com/search-phrases" title="How you found us.">How You Found Us</a> &middot; <a href="http://www.findlatitudeandlongitude.com/latest-search-phrases" title="Latest Searches">Searches</a></span></div>
+
+</div>
+
+<!--<div id="debugging" style="background:#FFF; border:#000 1px solid; padding:6px;"></div>--><div id="footer"><p class="copyright">
+  &copy;
+  2008 - 2016 David B. Zwiefelhofer. All Rights Reserved. <a href="http://www.fsbowebsite.com">FSBO</a> Website Design. Please review our <a href="http://www.findlatitudeandlongitude.com/privacy-policy/">Privacy Policy</a>.</p></div><!-- Start Quantcast tag -->
+<script type="text/javascript">
+_qoptions={
+qacct:"p-10StYEx74Kghk"
+};
+</script>
+<script type="text/javascript" src="http://edge.quantserve.com/quant.js"></script>
+<noscript>
+<img src="http://pixel.quantserve.com/pixel/p-10StYEx74Kghk.gif" style="display: none;" border="0" height="1" width="1" alt="Quantcast"/>
+</noscript>
+<!-- End Quantcast tag -->
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-6417143-1");
+pageTracker._trackPageview();
+} catch(err) {}</script></body>
+</html>
