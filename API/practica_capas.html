@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>practica1</title>
+
+  <link rel="stylesheet" href="https://js.arcgis.com/3.15/dijit/themes/claro/claro.css">
+  <link rel="stylesheet" href="https://js.arcgis.com/3.15/esri/css/esri.css">
+
+  <style>
+    html, body, #mapDiv{
+      height: 97%;
+      width: 98%;
+      margin: 1;
+      padding: 0;
+    }
+    #rightPane {
+      width: 20%;
+    }
+
+    #legendPane {
+      border: solid #97DCF2 1px;
+    }
+  </style>
+
+  <script src="https://js.arcgis.com/3.15/"></script>    
+
+  <script>      
+    var map;
+
+    //1. SE CREAN LAS VARIABALES GLOBALES QUE APUNTEN A LA DIRECCIÓN DE LOS DIFERENTES SERVICIOS.
+
+    var urlTiledService = "http://services.arcgisonline.com/arcgis/rest/services/World_Terrain_Base/MapServer";
+
+    var urlDynamicService = "http://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer";
+
+    /*Según en el enlace del map service cada feauture layer se identifica como: 
+      Cities (0), Highways (1), States (2), Counties (3)
+      */
+
+    var urlFeatureLayer0 = "http://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer/0"; //Cities
+    var urlFeatureLayer1 = "http://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer/1"; //Highways
+    var urlFeatureLayer2 = "http://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer/2"; //States
+    var urlFeatureLayer3 = "http://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer/3"; //Counties
+
+    require(["esri/map",
+           "esri/layers/ArcGISTiledMapServiceLayer",
+           //"esri/layers/ArcGISDynamicMapServiceLayer",
+           "esri/layers/FeatureLayer",
+                     
+           "esri/dijit/BasemapGallery",
+           "esri/arcgis/utils",
+           
+           "esri/dijit/Legend",
+           "dojo/_base/array",
+             
+           "dojo/parser",
+
+           "dijit/layout/BorderContainer",
+           "dijit/layout/ContentPane",
+           "dijit/TitlePane",
+           "dijit/layout/AccordionContainer",
+           "dojo/domReady!"], 
+    function(Map,
+            ArcGISTiledMapServiceLayer,
+            //ArcGISDynamicMapServiceLayer,
+            FeatureLayer,
+
+            BasemapGallery,
+            arcgisUtils,
+              
+            Legend,
+            arrayUtils,
+              
+            parser) {
+      parser.parse();
+
+      map = new Map("mapDiv", {
+        center: [-107, 46],
+        zoom: 4,
+        //basemap: "Streets"
+        isPanArrows: true
+      });
+
+      //2. SE CREA LA CAPA CON SUS OBJETOS:
+        
+      var tiledLayer = new ArcGISTiledMapServiceLayer(urlTiledService);
+        
+      //var dynamicLayer = new ArcGISDynamicMapServiceLayer(urlDynamicService, {id:"dyn"});
+        
+      var featureLayer0 = new FeatureLayer(urlFeatureLayer0, {id:"cities", mode: FeatureLayer.MODE_ONDEMAND, outFields:["*"]});
+      var featureLayer1 = new FeatureLayer(urlFeatureLayer1, {id:"highways", mode: FeatureLayer.MODE_ONDEMAND, outFields:["*"]});
+      var featureLayer2 = new FeatureLayer(urlFeatureLayer2, {id:"states", mode: FeatureLayer.MODE_ONDEMAND, outFields:["*"]});
+      var featureLayer3 = new FeatureLayer(urlFeatureLayer3, {id:"counties", mode: FeatureLayer.MODE_ONDEMAND, outFields:["*"]});
+
+      //3. SE AÑADE(N) LA(S) CAPA(S) AL MAPA
+        
+      map.addLayer(tiledLayer);
+        
+      //map.addLayer(dynamicLayer);
+
+      // Lo suyo sería añadir las capas en este orden y para que se muestren en el orden deseado (3,2,1,0) se usa los índices:
+
+      map.addLayer(featureLayer0); //Cities
+      map.addLayer(featureLayer1); //Highways
+      map.addLayer(featureLayer2); //States
+      map.addLayer(featureLayer3); //Counties 
+
+      //...o si no:
+
+      //map.addLayer([featureLayer0, featureLayer1, featureLayer2, featureLayer3]);
+        
+      //Se puede REORDENAR los feature layer de diferentes maneras:
+
+      map.reorderLayer(map.getLayer("cities"),3);
+      map.reorderLayer('highways',2);
+      map.reorderLayer("states",1);
+      map.reorderLayer(featureLayer3,0);
+
+      //Se puede dar VISIBILIDAD a un grupo de capas de un Dynamic Layer:
+ 
+      /*arrayVisibilidad = [-1,1,-1,3];
+      dynamicLayer.setVisibleLayers(arrayVisibilidad);*/
+
+      //AÑADIR WIDGET DE BASEMAPS
+
+      var basemapGallery = new BasemapGallery({
+        showArcGISBasemaps: true,
+        map: map
+      }, "basemapGallery");
+      basemapGallery.startup();
+      
+      basemapGallery.on("error", function(msg) {
+        console.log("basemap gallery error:  ", msg);
+      });
+
+      //AÑADIR WIDGET LEYENDA
+
+      map.on("layers-add-result", function (evt) {
+        var layerInfo = arrayUtils.map(evt.layers, function (layer, index) {
+          return {layer:layer.layer, title:layer.layer.name};
+        });
+        if (layerInfo.length > 0) {
+          var legendDijit = new Legend({
+            map: mapDiv,
+            layerInfos: layerInfo
+          }, "legendDiv");
+          legendDijit.startup();
+        }
+      });
+
+      //map.addLayer([featureLayer0, featureLayer1, featureLayer2, featureLayer3]);
+
+    });
+  </script>
+
+</head>
+
+
+<body class="claro">
+  <!--[if IE 7]>
+  <style>
+    html, body {
+    margin: 0;
+    }
+  </style>
+  <![endif]-->
+  <div id="content"
+       data-dojo-type="dijit/layout/BorderContainer"
+        data-dojo-props="design:'headline', gutters:true"
+       style="width: 100%; height: 100%; margin: 0;">
+
+    <div id="rightPane"
+         data-dojo-type="dijit/layout/ContentPane"
+         data-dojo-props="region:'right'">
+
+      <div data-dojo-type="dijit/layout/AccordionContainer">
+        <div data-dojo-type="dijit/layout/ContentPane" id="legendPane"
+             data-dojo-props="title:'Leyenda', selected:true">
+          <div id="legendDiv"></div>
+        </div>
+        <div data-dojo-type="dijit/layout/ContentPane"
+             data-dojo-props="title:'Info'">
+          This pane could contain tools or additional content
+        </div>
+      </div>
+    </div>
+    <div id="mapDiv"
+         data-dojo-type="dijit/layout/ContentPane"
+         data-dojo-props="region:'center'"
+         style="overflow:hidden;">
+      <div style="position:absolute; right:20px; top:10px; z-Index:999;">
+        <div data-dojo-type="dijit/TitlePane" 
+             data-dojo-props="title:'Cambiar Basemap', closable:false, open:false">
+          <div data-dojo-type="dijit/layout/ContentPane" style="width:380px; height:280px; overflow:auto;">
+            <div id="basemapGallery"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

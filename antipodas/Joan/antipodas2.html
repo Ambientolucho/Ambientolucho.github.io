@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    <title>Antipodas</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/3.15/esri/css/esri.css">
+    <style>
+      html, body, #map {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    <script src="https://js.arcgis.com/3.15/"></script>
+    <script>
+      var map;
+	  var map2;
+
+      require(["esri/map", 
+      	"esri/geometry/Point", 
+      	"esri/geometry/webMercatorUtils",
+      	"esri/geometry/extent", 
+      	"dojo/domReady!"], 
+	  function(
+	  	Map, 
+	  	Point, 
+	  	webMercatorUtils,
+	  	Extent) {
+        map = new Map("map", {
+          basemap: "streets",
+		  zoom: 5
+        });
+		map2 = new Map("map2", {
+          basemap: "streets",
+		  zoom: 5
+        });
+
+        map.on("aqui el listener",mi_funcion(evt){
+        	//aqui la logica de la función
+        });
+		
+		map.on("extent-change", function(change){
+			
+			center = change.extent.getCenter();
+		
+			var centerLatLong = webMercatorUtils.xyToLngLat(center.x, center.y);
+			var latitud = -centerLatLong[1];
+			var longitud;
+			if (centerLatLong[0] < 0){
+				longitud = centerLatLong[0] + 180;
+			}
+			else{
+				longitud = centerLatLong[0] - 180;
+				
+			}
+			var center2WebMercator = webMercatorUtils.lngLatToXY(longitud, latitud);
+			var center2 = new Point(center2WebMercator[0], center2WebMercator[1], map2.spatialReference);			
+			
+			if(map2.loaded){
+				map2.centerAndZoom(center2, 4);
+			}
+			
+		});
+		
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="map" style="width:45%; height:45%; float:left;"></div>
+	<div id="map2" style="width:45%; height:45%; float:right;"></div>
+  </body>
+</html>

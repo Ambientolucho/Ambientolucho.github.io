@@ -34,31 +34,84 @@
     <script>
       require([
         "esri/map",
-        "esri/geometry/Extent",
+        "esri/geometry/webMercatorUtils",
         "dojo/domReady!"
         ],
-        function(Map, Point) { //,Event Object Property
+        function(Map, webMercatorUtils) { //,Event Object Property
           var map1;
+          
+          //Creo el primer mapa
           map1 = new Map("map1", {
             basemap: "topo",  //For full list of pre-defined basemaps, navigate to http://arcg.is/1JVo6Wd
-            center: [-3.700345, 40.416691], // longitude, latitude
+            center: [-3.703272, 40.417025], // longitude, latitude
             zoom: 5
           });
+          
+          //Creo el segundo mapa
           var map2;
           map2 = new Map("map2", {
             basemap: "topo",  //For full list of pre-defined basemaps, navigate to http://arcg.is/1JVo6Wd
-            center: [-3.700345, 40.416691], // longitude, latitude
+            center: [176.299655, -40.416691], // longitude, latitude
             zoom: 5
           });
-          map1.on("extent-change", function(change){
-            var center = change.extent.getCenter();
-            map2.centerAt(center)
+          
+          //Llamo al listener del evento mover con el ratón el mapa.
+          map1.on("mouse-drag-end", function(mouseEvent){
+
+            var center = map1.extent.getCenter();
+            var longlat1 = webMercatorUtils.xyToLngLat(center.x, center.y);
+            var long1 = centerGeoMap1[0];
+            var lat1 = centerGeoMap1[1];
+
+            var lat2 = -lat1
+
+            if (long1 < 0) {
+              var long2 = long1 + 180;
+            }
+            else {
+              var long2 = long1 - 180;
+            };
+            var center2 = [long2, lat2];
+            map2.centerAt(center2);
           });
-          map2.on("extent-change", function(change){
-            var center = change.extent.getCenter();
-            map1.centerAt(center)
+
+          //Llamo al listener a la inversa
+          map2.on("mouse-drag-end", function(mouseEvent){
+
+            var center2 = map2.extent.getCenter();
+            var longlat2 = webMercatorUtils.xyToLngLat(center.x, center.y);
+            var long2 = centerGeoMap2[0];
+            var lat2 = centerGeoMap2[1];
+            map2.centerAt(longlat);
+
+            var lat2 = -lat1
+
+            if (Long1 < 0) {
+              var long2 = long1 + 180;
+            }
+            else {
+              var long2 = long1 - 180;
+            };
+
+            var center4 = [long2, lat2];
+            map1.centerAt(center4);
+
+
           });
-        });
+
+          map1.on("zoom-end", function(zoom){
+            var zoom = zoom.level;
+            map2.setZoom(zoom);
+          });
+
+          map2.on("zoom-end", function(zoom){
+            var zoom = zoom.level;
+            map1.setZoom(zoom);
+          });
+
+
+        });//Continue...
+        
     </script>
   </head>
 
