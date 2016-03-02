@@ -22,6 +22,14 @@
     #legendPane {
       border: solid #97DCF2 1px;
     }
+
+    #BasemapToggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 50;
+    }
+
   </style>
 
   <script src="https://js.arcgis.com/3.15/"></script>    
@@ -45,9 +53,11 @@
     var urlFeatureLayer3 = "http://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer/3"; //Counties
 
     require(["esri/map",
-           "esri/layers/ArcGISTiledMapServiceLayer",
+           //"esri/layers/ArcGISTiledMapServiceLayer",
            //"esri/layers/ArcGISDynamicMapServiceLayer",
            "esri/layers/FeatureLayer",
+
+           "esri/dijit/BasemapToggle",
                      
            "esri/dijit/BasemapGallery",
            "esri/arcgis/utils",
@@ -63,9 +73,11 @@
            "dijit/layout/AccordionContainer",
            "dojo/domReady!"], 
     function(Map,
-            ArcGISTiledMapServiceLayer,
+            //ArcGISTiledMapServiceLayer,
             //ArcGISDynamicMapServiceLayer,
             FeatureLayer,
+
+            BasemapToggle,
 
             BasemapGallery,
             arcgisUtils,
@@ -79,13 +91,13 @@
       map = new Map("mapDiv", {
         center: [-107, 46],
         zoom: 4,
-        //basemap: "Streets"
+        basemap: "streets",
         isPanArrows: true
       });
 
       //2. SE CREA LA CAPA CON SUS OBJETOS:
         
-      var tiledLayer = new ArcGISTiledMapServiceLayer(urlTiledService);
+      //var tiledLayer = new ArcGISTiledMapServiceLayer(urlTiledService);
         
       //var dynamicLayer = new ArcGISDynamicMapServiceLayer(urlDynamicService, {id:"dyn"});
         
@@ -94,9 +106,23 @@
       var featureLayer2 = new FeatureLayer(urlFeatureLayer2, {id:"states", mode: FeatureLayer.MODE_ONDEMAND, outFields:["*"]});
       var featureLayer3 = new FeatureLayer(urlFeatureLayer3, {id:"counties", mode: FeatureLayer.MODE_ONDEMAND, outFields:["*"]});
 
+      //AÑADIR WIDGET LEYENDA
+
+      map.on("layers-add-result", function (evt) {
+        var layerInfo = arrayUtils.map(evt.layers, function (layer, index) {
+          return {layer:layer.layer, title:layer.layer.name};
+        });
+        if (layerInfo.length > 0) {
+          var legendDijit = new Legend({
+            map: mapDiv,
+            layerInfos: layerInfo
+          }, "legendDiv");
+          legendDijit.startup();
+        }
+      });
       //3. SE AÑADE(N) LA(S) CAPA(S) AL MAPA
         
-      map.addLayer(tiledLayer);
+      //map.addLayer(tiledLayer);
         
       //map.addLayer(dynamicLayer);
 
@@ -135,22 +161,23 @@
         console.log("basemap gallery error:  ", msg);
       });
 
-      //AÑADIR WIDGET LEYENDA
+      //Dentro del widget de basemap se pueden borrar basemaps que no nos intetesan:
 
-      map.on("layers-add-result", function (evt) {
-        var layerInfo = arrayUtils.map(evt.layers, function (layer, index) {
-          return {layer:layer.layer, title:layer.layer.name};
-        });
-        if (layerInfo.length > 0) {
-          var legendDijit = new Legend({
-            map: mapDiv,
-            layerInfos: layerInfo
-          }, "legendDiv");
-          legendDijit.startup();
-        }
-      });
+      /*basemapGallery.on("load", function(){
+        basemapGallery.remove("basemap_9")
+      });*/
+
+      
 
       //map.addLayer([featureLayer0, featureLayer1, featureLayer2, featureLayer3]);
+
+      //AÑADIR WIDGET TOGGLE
+
+      var toggle = new BasemapToggle({
+        map: map,
+        basemap: "satellite"
+      }, "BasemapToggle");
+      toggle.startup();
 
     });
   </script>
@@ -182,7 +209,7 @@
         </div>
         <div data-dojo-type="dijit/layout/ContentPane"
              data-dojo-props="title:'Info'">
-          This pane could contain tools or additional content
+          ¡Este mapa mola, y punto!
         </div>
       </div>
     </div>
@@ -198,6 +225,10 @@
           </div>
         </div>
       </div>
+      <div id="BasemapToggle"
+           data-dojo-type="dijit/layout/ContentPane"
+           data-dojo-props="region:'left'"
+           style="overflow:hidden;"></div>
     </div>
   </div>
 </body>
